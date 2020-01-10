@@ -1,21 +1,17 @@
 %global debug_package   %{nil}
 %global import_path     github.com/gorilla/context
 %global gopath          %{_datadir}/gocode
-%global commit          708054d61e5a2918b9f4e9700000ee611dcf03f5
+%global commit          b06ed15e1c7a08fa1ba783fe94fff89127587f9e
 %global shortcommit     %(c=%{commit}; echo ${c:0:7})
 
 Name:           golang-github-gorilla-context
 Version:        0
-Release:        0.22.git%{shortcommit}%{?dist}
+Release:        0.24.git%{shortcommit}%{?dist}
 Summary:        A golang registry for global request variables
 License:        BSD
 URL:            http://www.gorillatoolkit.org/pkg/context
 Source0:        https://%{import_path}/archive/%{commit}/context-%{shortcommit}.tar.gz
-%if 0%{?fedora} >= 19
-BuildArch:      noarch
-%else
-ExclusiveArch:  %{ix86} x86_64 %{arm}
-%endif
+ExclusiveArch:  %{?go_arches:%{go_arches}}%{!?go_arches:x86_64 aarch64 ppc64le s390x}
 
 %description
 Package gorilla/context stores values shared during a request lifetime.
@@ -52,7 +48,9 @@ install -d %{buildroot}/%{gopath}/src/%{import_path}
 cp -av *.go %{buildroot}/%{gopath}/src/%{import_path}
 
 %check
-GOPATH=%{buildroot}/%{gopath} go test %{import_path}
+# disabled check for now:
+# https://bugzilla.redhat.com/show_bug.cgi?id=1110497
+#GOPATH=%{buildroot}/%{gopath} go test %{import_path}
 
 %files devel
 %defattr(-,root,root,-)
@@ -65,6 +63,14 @@ GOPATH=%{buildroot}/%{gopath} go test %{import_path}
 %{gopath}/src/%{import_path}/*.go
 
 %changelog
+* Fri Apr 21 2017 Josh Boyer <jwboyer@redhat.com> 0-0.24.git
+- Resolves: rhbz#1344590 - built for all architectures
+
+* Tue Jun 17 2014 Lokesh Mandvekar <lsm5@redhat.com> 0-0.23.git
+- Resolves: rhbz#1108722 - update for docker-1.0.0
+- Resolves: rhbz#1110491 - make exclusivearch for x86_64 since golang only available for x86_64
+- go test disabled
+
 * Wed Jan 15 2014 Lokesh Mandvekar <lsm5@redhat.com> 0-0.22.git708054d
 - golang exclusivearch for el6+
 - add check
